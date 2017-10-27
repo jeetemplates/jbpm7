@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+       xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+    	http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
+    
+    <bean id="process" factory-method="newClassPathResource" class="org.kie.internal.io.ResourceFactory">
+        <constructor-arg>
+            <value>jbpm/processes/sample.bpmn</value>
+        </constructor-arg>
+    </bean>
+    
+    <bean id="runtimeEnvironment" class="org.kie.spring.factorybeans.RuntimeEnvironmentFactoryBean">
+        <property name="type" value="DEFAULT"/>
+        <property name="entityManagerFactory" ref="jbpmEMF"/>
+        <property name="transactionManager" ref="jbpmTxManager"/>
+        <property name="assets">
+            <map>
+                <entry key-ref="process">
+                    <util:constant static-field="org.kie.api.io.ResourceType.BPMN2"/>
+                </entry>
+            </map>
+        </property>
+    </bean>
+
+
+    <bean id="runtimeManager" class="org.kie.spring.factorybeans.RuntimeManagerFactoryBean" destroy-method="close">
+        <property name="identifier" value="spring-rm"/>
+        <property name="runtimeEnvironment" ref="runtimeEnvironment"/>
+    </bean>
+
+</beans>
